@@ -20,12 +20,16 @@ class Vec
 
 
 class Cell
+  constructor: (@pos = new Vec(), @dna) ->
 
 
 class Aquarium
-  constructor: ->
+  constructor: (@w=500,@h=500) ->
     @cells = for i in [1..10]
-      new Cell ->
+      new Cell @randPos(), clumpy
+
+  randPos: ->
+    new Vec Math.random()*@w, Math.random()*@h
 
 
 class CanvasRenderer
@@ -34,16 +38,16 @@ class CanvasRenderer
       @c
       .fillStyle("#333")
       .beginPath()
-      .arc(0,0,10,10,0,Math.PI*2,true)
+      .arc(cell.pos.x,cell.pos.y,10,10,0,Math.PI*2,true)
       .fill()
     
 
-
-aq = new Aquarium
+w = h = 500
+aq = new Aquarium 500,500
 
 
 $ ->
-  cq().framework(
+  cq(w,h).framework(
     onRender: -> 
       new CanvasRenderer aq, @
   ).appendTo("body")
