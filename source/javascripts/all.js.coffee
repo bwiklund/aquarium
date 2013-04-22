@@ -1,10 +1,13 @@
 # hello
 
-MAX_CELL_COUNT = 200
+MAX_CELL_COUNT = 100
 
 clumpy = ->
-  @child = clumpy
-  @color = [200,0,0]
+  @child = clumpy if Math.random() < 0.1
+  if @pos.x < 256
+    @color = [200,0,0]
+  else
+    @color = [150,150,160]
   #@split() if @sniff('clumpy') < 5
 
 
@@ -27,6 +30,7 @@ class Vec
 
 class Cell
   constructor: (@pos = new Vec(), @dna) ->
+    @age = 0
     @vel = new Vec
     @acc = new Vec
     @drag = 0.1
@@ -35,12 +39,13 @@ class Cell
 
     c = ~~(Math.random()*50)
     @tint = [c,c,c]
-    @color = [128,0,0]
+    @color = [150,150,150]
   getColor: ->
     [@tint[0]+@color[0],@tint[1]+@color[1],@tint[2]+@color[2]]
   think: ->
     @dna.call @
   applyPhysics: ->
+    @age+=0.0005
     @vel.add @acc
     @pos.add @vel
     @acc.set 0,0,0
@@ -57,6 +62,8 @@ class Cell
         f = (1-f/(f+1))*0.2
       else
         f = f*0.2
+        # new cells 'phase' in, so shit doesn't blow up
+        f *= (@age) / ( (@age) + 1 )
       forceVec = dist.get().normalize().mul(f)
       @acc.add forceVec
 
@@ -102,8 +109,10 @@ class Aquarium
 class CanvasRenderer
   constructor: (@aq, @c) ->
     @c.clearRect(0,0,@c.canvas.width,@c.canvas.height)
-    for cell in @aq.cells
-      continue if Math.abs((cell.pos.z-@aq.h/2)) > 20
+    cells = @aq.cells.slice 0
+    cells.sort (a,b) -> a.z-b.z
+    for cell in cells
+      #continue if Math.abs((cell.pos.z-@aq.h/2)) > 20
       color = cell.getColor()
       color = cq.color(color[0],color[1],color[2],1.0).toHex()
       @c
