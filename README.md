@@ -1,8 +1,6 @@
-floormat
+![Sample](https://raw.github.com/bwiklund/aquarium/master/source/images/sample.png)
+
+aquarium
 ========
 
-An empty middleman project, set up with my favorites. Saves five minutes of setup.
-
-- Coffeescript
-- Slim
-- Sass
+wip
