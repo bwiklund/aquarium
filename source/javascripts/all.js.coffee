@@ -28,10 +28,10 @@ class Cell
     @vel = new Vec
     @acc = new Vec
     @drag = 0.1
+    @rad = 5
   applyPhysics: ->
     @vel.add @acc
     @pos.add @vel
-    
     @acc.set 0,0
     @vel.mul 1-@drag
   interact: ->
@@ -60,7 +60,7 @@ class CanvasRenderer
       @c
       .fillStyle("#333")
       .beginPath()
-      .arc(cell.pos.x,cell.pos.y,10,10,0,Math.PI*2,true)
+      .arc(cell.pos.x,cell.pos.y,cell.rad,0,Math.PI*2,true)
       .fill()
     
 
