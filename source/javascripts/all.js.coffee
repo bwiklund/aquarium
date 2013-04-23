@@ -11,28 +11,44 @@ limited: each cell has a @mask, @attractMask, @repelMask
 
 ###
 
-MAX_CELL_COUNT = 100
-
+MAX_CELL_COUNT = 10
 
 
 egg = ->
+  @i ?= 0
+  @attract = 0b0
+  @repel = 0b1
   @color = [200,0,0]
-  if !@done?
-    @link @divide( egg )
-  @done = true
+  if @i == 0
+    @color = [150,150,160]
+
+  if !@done? && @age > 10
+    child = @divide( egg )
+    child?.i = @i+1
+    @motor = @link child
+    @motor?.thrust = 0.1
+    @done = true
+
 
 
 
 class Link
   constructor: (@a,@b) ->
+    @thrust = 0
 
   update: ->
     dist = @a.pos.get().sub(@b.pos)
     combinedRadius = @a.rad + @b.rad
     spaceBetween = dist.mag() - combinedRadius
-    force = spaceBetween * 0.001
+    force = spaceBetween * 0.03# * (@b.age*0.1) / ( (@b.age*0.1) + 1 )
     forceVec = dist.normalize().mul force
-    @a.acc.sub forceVec
+    if force > 0 # links should only pull, repulsion is already taken care of
+      @a.acc.sub forceVec
+      @b.acc.add forceVec
+
+    # and apply and flaggelumations
+    forceVec.normalize().mul(@thrust)
+    @a.acc.add forceVec
     @b.acc.add forceVec
     undefined
 
@@ -80,7 +96,7 @@ class Cell
     @dna.call @
 
   applyPhysics: ->
-    @age+=0.05
+    @age+=1
     @vel.add @acc
     @pos.add @vel
     @acc.set 0,0,0
@@ -107,13 +123,15 @@ class Cell
       else
         f = f*0.2
         # new cells 'phase' in, so shit doesn't blow up
-        f *= (@age) / ( (@age) + 1 )
+        f *= (@age*0.001) / ( (@age*0.001) + 1 )
       forceVec = dist.get().normalize().mul(f)
       @acc.add forceVec
 
   link: (cell) ->
-    return if !cell?
-    @aq.links.push new Link @,cell
+    return null if !cell?
+    link = new Link @,cell
+    @aq.links.push link
+    link
 
   divide: (childProto) ->
     return null if @aq.cells.length > MAX_CELL_COUNT
