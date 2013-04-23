@@ -1,14 +1,41 @@
 # hello
 
+###
+
+options for managing forces
+
+bitfield: assign a formula to each bit in an N-bit field, and have arbitrary rules for each
+
+limited: each cell has a @mask, @attractMask, @repelMask
+
+
+###
+
 MAX_CELL_COUNT = 100
 
-clumpy = ->
-  @child = clumpy if Math.random() < 0.1
-  if @pos.x < 256
-    @color = [200,0,0]
-  else
-    @color = [150,150,160]
-  #@split() if @sniff('clumpy') < 5
+
+
+egg = ->
+  @color = [200,0,0]
+  if !@done?
+    @link @divide( egg )
+  @done = true
+
+
+
+class Link
+  constructor: (@a,@b) ->
+
+  update: ->
+    dist = @a.pos.get().sub(@b.pos)
+    combinedRadius = @a.rad + @b.rad
+    spaceBetween = dist.mag() - combinedRadius
+    force = spaceBetween * 0.001
+    forceVec = dist.normalize().mul force
+    @a.acc.sub forceVec
+    @b.acc.add forceVec
+    undefined
+
 
 
 
@@ -29,7 +56,7 @@ class Vec
 
 
 class Cell
-  constructor: (@pos = new Vec(), @dna) ->
+  constructor: (@aq, @pos = new Vec(), @dna) ->
     @age = 0
     @vel = new Vec
     @acc = new Vec
@@ -40,19 +67,35 @@ class Cell
     c = ~~(Math.random()*50)
     @tint = [c,c,c]
     @color = [150,150,150]
+    @mask = 0b1
+    @attract = 0b1
+    @repel = 0b0
+
+    @links = []
+
   getColor: ->
     [@tint[0]+@color[0],@tint[1]+@color[1],@tint[2]+@color[2]]
+  
   think: ->
     @dna.call @
+
   applyPhysics: ->
-    @age+=0.0005
+    @age+=0.05
     @vel.add @acc
     @pos.add @vel
     @acc.set 0,0,0
     @vel.mul 1-@drag
+
   interactWith: (cells) ->
     for cell in cells
       continue if cell == @
+      
+      attractStrength = 0
+      if @attract & cell.mask > 0
+        attractStrength += 1
+      if @repel & cell.mask > 0
+        attractStrength -= 1
+
       # collision
       dist = cell.pos.get().sub(@pos)
       combinedRadius = @rad + cell.rad
@@ -60,6 +103,7 @@ class Cell
       if f > 0
         f *= 5
         f = (1-f/(f+1))*0.2
+        f *= attractStrength
       else
         f = f*0.2
         # new cells 'phase' in, so shit doesn't blow up
@@ -67,39 +111,48 @@ class Cell
       forceVec = dist.get().normalize().mul(f)
       @acc.add forceVec
 
+  link: (cell) ->
+    return if !cell?
+    @aq.links.push new Link @,cell
+
+  divide: (childProto) ->
+    return null if @aq.cells.length > MAX_CELL_COUNT
+    child = new Cell @aq, @pos.get(), childProto
+    child.pos.x += Math.random()-0.5
+    child.pos.y += Math.random()-0.5
+    child.pos.z += Math.random()-0.5
+    @aq.babies.push child
+    child
 
 
 class Aquarium
   constructor: (@w=500,@h=500) ->
     # @cells = for i in [1..100]
     #   new Cell @randPos(), clumpy
+
     @cells = []
-    @cells.push new Cell new Vec(@w/2,@h/2,@h/2), clumpy
+    @cells.push new Cell @, new Vec(@w/2,@h/2,@h/2), egg
+    @babies = []
+
+    @links = []
 
   randPos: ->
     new Vec Math.random()*@w, Math.random()*@h
 
   step: ->
-    babies = []
-    for cell in @cells
-      break if @cells.length > MAX_CELL_COUNT
-      if cell.child?
-        child = new Cell cell.pos.get(), cell.child
-        child.pos.x += Math.random()-0.5
-        child.pos.y += Math.random()-0.5
-        child.pos.z += Math.random()-0.5
-        cell.child = null
-        babies.push child
-
-
-    @cells = @cells.concat babies
+    @cells = @cells.concat @babies
+    @babies.length = 0
 
 
     for cell in @cells
-      #cell.acc.set Math.random()-0.5, Math.random()-0.5
+      cell.acc.set Math.random()-0.5, Math.random()-0.5
+      cell.acc.mul 0.1
       cell.think()
       cell.pos.bound(0,0,0,@w,@h,@h)
       cell.interactWith @cells
+
+    for link in @links
+      link.update()
 
     for cell in @cells
       cell.applyPhysics()
