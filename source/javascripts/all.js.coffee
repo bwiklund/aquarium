@@ -1,8 +1,7 @@
-require ['lib/link',
-         'lib/vec',
-         'lib/cell',
-         'lib/canvas_query_adapter',
-         'lib/aquarium'], (Link,Vec,Cell,RenderAdapter,Aquarium) ->
+#= require ./core
+#= require_tree ./lib
+
+@aqua.define 'Test', (Link,Vec,Cell,CanvasQueryAdapter,Aquarium) ->
 
   egg = ->
     @i ?= 0
@@ -28,5 +27,9 @@ require ['lib/link',
       onStep: ->
         aq.step()
       onRender: -> 
-        new RenderAdapter aq, @
+        new CanvasQueryAdapter aq, @
+        return false
     ).appendTo("body")
+
+
+app = @aqua.instance().resolve 'Test'

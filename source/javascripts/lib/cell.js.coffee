@@ -1,5 +1,5 @@
 # The cell class. Still hugely in flux, no point documenting yet.
-define ['lib/vec','lib/link'], (Vec,Link) ->
+@aqua.define 'Cell', (Vec,Link) ->
 
   MAX_CELL_COUNT = 10
   

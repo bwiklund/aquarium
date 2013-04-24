@@ -1,5 +1,5 @@
 # main Aquarium instance. holds entity lists, and is the entry point for update loops.
-define ['lib/vec'], (Vec) ->
+@aqua.define 'Aquarium', (Vec) ->
 
   class Aquarium
     constructor: (@w=500,@h=500) ->

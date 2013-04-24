@@ -4,7 +4,7 @@
 # except mag(), which returns the length of the vector
 #
 # That way, mostly everything can be chained.
-define [], ->
+@aqua.define 'Vec', ->
   class Vec
     constructor: (@x=0,@y=0,@z=0) ->
     set: (@x=0,@y=0,@z=0) -> @

@@ -1,5 +1,5 @@
 # A 'rope' between two particles
-define [], -> 
+@aqua.define 'Link', -> 
 
   class Link
     constructor: (@a,@b) ->

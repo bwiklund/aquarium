@@ -1,4 +1,4 @@
-define [], ->
+@aqua.define 'CanvasQueryAdapter', ->
 
   # a class that represents a render pass.
   # accepts the Aquarium instance, and the canvasQuery instance.
