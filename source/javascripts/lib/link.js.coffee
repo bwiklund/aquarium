@@ -1,6 +1,6 @@
-# A 'rope' between two particles
 @aqua.define 'Link', -> 
 
+  # A 'rope' between two particles.
   class Link
     constructor: (@a,@b) ->
       @thrust = 0

@@ -1,9 +1,9 @@
-@aqua.define 'CanvasQueryAdapter', ->
+@aqua.define 'CanvasFrame', ->
 
   # a class that represents a render pass.
   # accepts the Aquarium instance, and the canvasQuery instance.
   # meant to be swappable with another adapter, for say, threejs
-  class CanvasQueryAdapter
+  class CanvasFrame
     constructor: (@aq, @c) ->
       @c.clearRect(0,0,@c.canvas.width,@c.canvas.height)
       cells = @aq.cells.slice 0

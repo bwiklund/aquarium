@@ -1,6 +1,6 @@
-# The cell class. Still hugely in flux, no point documenting yet.
 @aqua.define 'Cell', (Vec,Link) ->
 
+  # The cell class. Still hugely in flux, no point documenting yet.
   MAX_CELL_COUNT = 10
   
   class Cell

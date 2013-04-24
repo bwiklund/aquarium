@@ -1,10 +1,10 @@
-# Standard 3d vector class. 
-#
-# All operations work on the current vector, and return it, 
-# except mag(), which returns the length of the vector
-#
-# That way, mostly everything can be chained.
 @aqua.define 'Vec', ->
+  # Standard 3d vector class. 
+  #
+  # All operations work on the current vector, and return it, 
+  # except mag(), which returns the length of the vector
+  #
+  # That way, mostly everything can be chained.
   class Vec
     constructor: (@x=0,@y=0,@z=0) ->
     set: (@x=0,@y=0,@z=0) -> @
