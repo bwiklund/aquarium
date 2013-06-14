@@ -29,7 +29,7 @@
       # linking to the next cell. note that links can
       # also have thrust, which is force directed along
       # their axis, like flagellum.
-      @rope = @link child
+      @rope = @link @child
       @rope?.thrust = 0.1
   
   # spinning up our instance of aquarium
